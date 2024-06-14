@@ -1,0 +1,16 @@
+/__pycache__
+/.ipynb_checkpoints
+/backup
+/data
+/depreciated
+/dump
+/embeddings/
+/FlagEmbedding
+/images
+/models
+ideas.md
+lightning
+*.ini
+*.ipynb
+t00*
+airflow*
