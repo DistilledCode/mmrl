@@ -1,49 +1,61 @@
 # Multi-Media Representational Learning for Social Media Popularity Prediction
 
-This porject use the following features of a image posted on Reddit to predict it's popularity
-* Title Embeddings
-* Image Embeddings
-* Text embeddings of caption generated from image
-* Visual Embeddings (combined embedding of both image and text)
-* Post Metadata
-* Author's Metadata
+This project leverages advanced machine learning and data engineering techniques to predict the popularity of Reddit posts based on various features. It showcases the integration of multiple cutting-edge technologies to create a robust, automated pipeline for data processing and model training.
 
-The whole pipeline is managed using Apache Airflow. This includes
-*  Scrapping data
-*  Filtering data
-*  Fetching images
-*  Generating image captions
-*  Creating text, visual & combined embeddings
-*  Feature merging
-*  Training & saving the model
+## Key Technologies and Features
 
-The pipeline is scheduled to run daily and train the model using new scrapped data. Each model trained is also saved with all it's evaluation metric.
+### ETL Pipeline
+- **Apache Airflow**: Orchestrates the entire data pipeline, from scraping to model training, ensuring daily updates and seamless workflow management.
 
-## Installation
+### Deep Learning and Embeddings
+- **TensorFlow**: Powers the multimodal deep learning model for popularity prediction.
+- **Text Embeddings**: Utilizes advanced NLP techniques to create meaningful representations of post titles. The model used: [FlagEmbedding's bge-m3](https://huggingface.co/BAAI/bge-m3)
+- **Image Embeddings**: Generates rich visual features from post images. The model Used: [Vision Transformer Image Classification](https://huggingface.co/timm/vit_large_patch16_384.augreg_in21k_ft_in1k)
+- **Visual Embeddings**: Combines image and text data for a comprehensive multimodal representation. The model used: [FlagEmbedding's VisualBGE](https://github.com/FlagOpen/FlagEmbedding/tree/master/FlagEmbedding/visual)
+
+### Computer Vision
+- **Image Caption Generation**: Automatically generates descriptive captions for images, adding an extra layer of textual data. The model used: [Microsoft Kosmos-2](https://huggingface.co/microsoft/kosmos-2-patch14-224)
+
+### Data Processing
+- **Reddit API (PRAW)**: Facilitates efficient data scraping from Reddit.
+- **FlagEmbedding**: Employed to create sophisticated visual and combined embeddings.
+
+### Features Used for Prediction
+1. Title Embeddings
+2. Image Embeddings
+3. Caption Embeddings (generated from images)
+4. Visual Embeddings (combined image and text)
+5. Post Metadata
+6. Author's Metadata
+
+## Airlfow Pipeline Overview
+
+The Airflow-managed pipeline includes:
+1. Data Scraping
+2. Data Filtering
+3. Image Fetching
+4. Image Caption Generation
+5. Embedding Creation (Text, Visual, Combined)
+6. Feature Merging
+7. Model Training and Evaluation
+8. Model Persistence
+
+The pipeline runs daily, continuously improving the model with new data. Each trained model is saved along with its evaluation metrics for tracking performance over time.
+
+## Installation and Setup
 
 ### Dependencies
 
-**Airlfow**   
-
+#### Apache Airflow
 ```shell
-
 export AIRFLOW_HOME=~/airflow
-
 AIRFLOW_VERSION=2.9.1
-
-# Extract the version of Python you have installed. If you're currently using a Python version that is not supported by Airflow, you may want to set this manually.
-# See above for supported versions.
 PYTHON_VERSION="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
-
 CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
-# For example this would install 2.9.1 with python 3.8: https://raw.githubusercontent.com/apache/airflow/constraints-2.9.1/constraints-3.8.txt
-
 pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
-
 ```
 
-**FlagEmbedding**
-
+#### FlagEmbedding
 ```shell
 git clone https://github.com/FlagOpen/FlagEmbedding.git
 cd FlagEmbedding
@@ -51,74 +63,51 @@ pip install -e .
 pip install torchvision timm einops ftfy
 ```
 
-You are also required to download the model for the Visual Embedding in order to generate combined embeddings. Download the model of your choice from https://huggingface.co/BAAI/bge-visualized and specify the path to weights in `src\t06.4_create_embeddings_combined.py:50`
+Note: Download the Visual Embedding model from [BAAI/bge-visualized](https://huggingface.co/BAAI/bge-visualized) and specify the path in `src/t06.4_create_embeddings_combined.py:50`.
 
-
-**Other dependencies**
-
+#### Other Dependencies
 ```shell
 pip install -r requirements.txt
 ```
 
-### Setting up the project
+### Project Setup
 
-1. Clone the project
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/DistilledCode/mmrl.git
+   cd mmrl
+   ```
 
-```bash
-git clone https://github.com/DistilledCode/mmrl.git
-cd mmrl
-```
+2. Configure Reddit credentials in `praw.ini`:
+   ```ini
+   [bot1]
+   client_id=secret
+   client_secret=secret
+   username=secret
+   password=secret
 
-2. Create `praw.ini` & save Reddit credentials
+   [bot2]
+   client_id=secret
+   client_secret=secret
+   password=secret
+   username=secret
+   ```
 
-```ini
-[bot1]
-client_id=secret
-client_secret=secret
-username=secret
-password=secret
+3. Start the scraper:
+   ```shell
+   ./monitor_scrapper.sh
+   ```
 
-[bot2]
-client_id=secret
-client_secret=secret
-password=secret
-username=secret
-```
+4. Set up the Airflow environment:
+   ```bash
+   export PROJ_DIR=$PWD
+   cp praw.ini smpp_pipeline.py ~/airflow/dags
+   ```
 
+5. Launch Airflow:
+   ```shell
+   airflow scheduler &
+   airflow webserver -p 8080 &
+   ```
 
-Using 2 accounts is recommended, one for scraping and one for fetching the images. Using one account for both might give 429 response.
-
-
-3. Start the scrapper. You may start the scrapper at any directory of your choice but `monitor_scrapper.sh`, `scrap_comments.py` & `praw.ini` should be in a single directory.
-
-```shell
-./monitor_scrapper.sh
-```
-
-4. Export the `PROJ_DIR` variable
-
-```bash
-cd mmrl
-export PROJ_DIR=$PWD
-```
-
-5. Copy `praw.ini` and `smpp_pipeline.py` to `~/airflow/dags`
-
-```shell
-cp praw.ini smpp_pipeline.py ~/airflow/dags
-cp smpp_pipeline.py ~/airflow/dags
-```
-
-6. Start the Airflow scheduler from the `PROJ_DIR` directory 
-
-```shell
-cd mmrl
-airflow scheduler &
-```
-7. Start the Airflow Webserver & enable the pipeline
-```shell
-airflow webserver -p 8080 &
-```
-This will start the server at `http://localhost:8080`
-
-
+   Access the Airflow web interface at `http://localhost:8080` to enable and monitor the pipeline.
