@@ -1,4 +1,4 @@
-# Multi-Modal Representational Learning for Social Media Popularity Prediction
+# Multi-Modal Representation Learning for Social Media Popularity Prediction
 
 This project leverages advanced machine learning and data engineering techniques to predict the popularity of Reddit posts based on various features. It showcases the integration of multiple cutting-edge technologies to create a robust, automated pipeline for data processing and model training.
 
