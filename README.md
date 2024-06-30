@@ -1,4 +1,4 @@
-# Multi-Media Representational Learning for Social Media Popularity Prediction
+# Multi-Modal Representational Learning for Social Media Popularity Prediction
 
 This project leverages advanced machine learning and data engineering techniques to predict the popularity of Reddit posts based on various features. It showcases the integration of multiple cutting-edge technologies to create a robust, automated pipeline for data processing and model training.
 
@@ -7,14 +7,12 @@ This project leverages advanced machine learning and data engineering techniques
 ### ETL Pipeline
 - **Apache Airflow**: Orchestrates the entire data pipeline, from scraping to model training, ensuring daily updates and seamless workflow management.
 
-### Deep Learning and Embeddings
+#### Deep Learning and Embeddings
+- **Image Caption Generation**: Automatically generates detailed descriptive captions for images using multi-modal large language models (LLMs).
 - **TensorFlow**: Powers the multimodal deep learning model for popularity prediction.
-- **Text Embeddings**: Utilizes advanced NLP techniques to create meaningful representations of post titles. The model used: [FlagEmbedding's bge-m3](https://huggingface.co/BAAI/bge-m3)
-- **Image Embeddings**: Generates rich visual features from post images. The model Used: [Vision Transformer Image Classification](https://huggingface.co/timm/vit_large_patch16_384.augreg_in21k_ft_in1k)
-- **Visual Embeddings**: Combines image and text data for a comprehensive multimodal representation. The model used: [FlagEmbedding's VisualBGE](https://github.com/FlagOpen/FlagEmbedding/tree/master/FlagEmbedding/visual)
-
-### Computer Vision
-- **Image Caption Generation**: Automatically generates descriptive captions for images, adding an extra layer of textual data. The model used: [Microsoft Kosmos-2](https://huggingface.co/microsoft/kosmos-2-patch14-224)
+- **Text Embeddings**: Utilizes advanced NLP techniques to create meaningful representations of post titles. The model used: [FlagEmbedding's bge-m3](https://huggingface.co/BAAI/bge-m3).
+- **Image Embeddings**: Generates rich visual features from post images. The model used: [Vision Transformer Image Classification](https://huggingface.co/timm/vit_large_patch16_384.augreg_in21k_ft_in1k).
+- **Visual Embeddings**: Combines image and text data for a comprehensive multimodal representation. The model used: [FlagEmbedding's VisualBGE](https://github.com/FlagOpen/FlagEmbedding/tree/master/FlagEmbedding/visual).
 
 ### Data Processing
 - **Reddit API (PRAW)**: Facilitates efficient data scraping from Reddit.
